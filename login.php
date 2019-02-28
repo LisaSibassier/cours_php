@@ -5,17 +5,19 @@
 		"password" => "caca"
 	);
 	$usertmp = "";
+	$texte_user = "";
+	$texte_pass = "";
 
 	if(!empty($_POST)) {
 		if ($utilisateur['name'] == $_POST['username']) {
 			if ($utilisateur['password'] == $_POST['pass']) {
-				echo "bien connecté";
+				$texte_pass = "bien connecté";
 			} else {
-				echo "mot de passe incorrect";
+				$texte_pass = "mot de passe incorrect";
 				$usertmp = $_POST['username'];
 			}
 		} else {
-			echo "nom d'utilisateur inconnu";
+			$texte_user = "nom d'utilisateur inconnu";
 		}
 	}
 ?>
@@ -66,11 +68,13 @@
 					<div class="wrap-input100 validate-input" data-validate = "Enter username">
 						<input class="input100" type="text" name="username" placeholder="Username" value="<?= $usertmp ?>">
 						<span class="focus-input100" data-placeholder="&#xf207;"></span>
+						<p><?= $texte_user ?></p>
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate="Enter password">
 						<input class="input100" type="password" name="pass" placeholder="Password">
 						<span class="focus-input100" data-placeholder="&#xf191;"></span>
+						<p><?= $texte_pass ?></p>
 					</div>
 
 					<div class="contact100-form-checkbox">
