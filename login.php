@@ -1,23 +1,49 @@
 <?php
+	//MODE DEBUG
+	error_reporting(E_ALL);
+	ini_set("display_errors", 1);
 	//print_r($_POST);
-	$utilisateur = array(
-		"name" => "yoan",
-		"password" => "caca"
-	);
-	$usertmp = "";
-	$texte_user = "";
-	$texte_pass = "";
 
+	//CONNEXION BASE DE DONNEES MYSQL
+	try
+	{
+		$db = new PDO('mysql:host=localhost; dbname=blog_e_commerce; charset=utf8', 'root', 'root');
+	}
+	catch(Exception $e)
+	{
+		die('Erreur : '.$e->getMessage());
+	}
+	
+	$usertmp = "";
+	$msg_error = "";
+
+	//Si les champs ont été rempli, $_POST n'est donc pas vide
 	if(!empty($_POST)) {
-		if ($utilisateur['name'] == $_POST['username']) {
-			if ($utilisateur['password'] == $_POST['pass']) {
-				$texte_pass = "bien connecté";
+		//On injecte les variables de $_POST dans d'autres variables (Par sécurité)
+		$mail = $_POST['mail'];
+		$pass = $_POST['pass'];
+		
+		$req = $db->prepare('SELECT id FROM user WHERE mail= :mail');
+		$req->bindParam(':mail', $mail);
+		$req->execute();
+		$checkmail = $req->fetch(); 
+
+		if (!empty($checkmail)) {
+
+			$req = $db->prepare('SELECT id FROM user WHERE mail= :mail AND password= :pass');
+			$req->bindParam(':mail', $mail);
+			$req->bindParam(':pass', $pass);
+			$req->execute();
+			$checkpass = $req->fetchAll(); 
+
+			if (!empty($checkpass)) {
+				$msg_error = "Vous êtes connecté";
 			} else {
-				$texte_pass = "mot de passe incorrect";
-				$usertmp = $_POST['username'];
+				$msg_error = "Mot de passe incorrect";
+				$usertmp = $_POST['mail'];
 			}
 		} else {
-			$texte_user = "nom d'utilisateur inconnu";
+			$msg_error = "Email utilisateur inconnu";
 		}
 	}
 ?>
@@ -64,17 +90,17 @@
 					<span class="login100-form-title p-b-34 p-t-27">
 						Log in
 					</span>
-
+					<span class="text-center p-t-90">
+						<?= $msg_error ?>
+					</span>
 					<div class="wrap-input100 validate-input" data-validate = "Enter username">
-						<input class="input100" type="text" name="username" placeholder="Username" value="<?= $usertmp ?>">
+						<input class="input100" type="text" name="mail" placeholder="Votre email" value="<?= $usertmp ?>">
 						<span class="focus-input100" data-placeholder="&#xf207;"></span>
-						<p><?= $texte_user ?></p>
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate="Enter password">
-						<input class="input100" type="password" name="pass" placeholder="Password">
+						<input class="input100" type="password" name="pass" placeholder="Votre mot-de-passe">
 						<span class="focus-input100" data-placeholder="&#xf191;"></span>
-						<p><?= $texte_pass ?></p>
 					</div>
 
 					<div class="contact100-form-checkbox">
